@@ -20,17 +20,41 @@ let authcontrollers = class insert{
           let {nom,email,password,passConfirm} = req.body
         //PassConfirm 
             // verifier si email a deja ete utiliser
+            let sql ="INSERT INTO `user_session` (`nom`,  `email`, `password`) VALUES (?,?,?)";
+        
         let req_verif_exist_email = ' SELECT email FROM user_session WHERE  email = ?'
+        
         db.query( req_verif_exist_email ,[email], async (err,result) =>{
 
-            if(err){
-                console.log(error)
+            if(result ==''){
+
+              //CRYPTE LES DONNEES avec cryptage avec bcrypt
+
+                  var hashedPassword = await bcrypt.hash(password ,8)
+                  console.log(hashedPassword)
+ 
+                  let sql_hash ="INSERT INTO `user_session` set ? ";
+              
+                  db.query(sql_hash,{nom,email,password:hashedPassword},(err, result) => {
+                    console.log("bonjour ");
+                    if (err) {
+                      console.log("ERREUR hashed", err);
+                      // res.send('bonjour')
+                    } else {
+                      console.log("success hashed", result);
+                      res.redirect("/");
+                    }
+                  }
+                ); 
             }
-            if(result.length >0){
-                return res.render('inscrip',{
-                    message: "email deja utilise"
-                }) 
+            else{
+                console.log('entrer une autre adresse email')
             }
+            // if(result.length >0){
+            //     return res.render('inscrip',{
+            //         message: "email deja utilise"
+            //     }) 
+            // }
            // -----------important ------//
             //verifier si les mot de pass sont les meme
             //  else if( password !== PassConfirm){
@@ -45,27 +69,24 @@ let authcontrollers = class insert{
         //     let { nom,  email, password} = req.body;
         //     console.log("donnee_du formulaire", req.body);
           
-            let sql =
-              "INSERT INTO `user_session` (`nom`,  `email`, `password`) VALUES (?,?,?)";
+           
+            //   db.query(sql,[nom, email,password],(err, result) => {
+            //     console.log("bonjour ");
+            //     if (err) {
+            //       console.log("ERREUR", err);
+            //       // res.send('bonjour')
+            //     } else {
+            //       console.log("success", result);
+            //       res.redirect("/");
+            //     }
+            //   }
+            // ); 
+
+
+               
+   
           
-              db.query(sql,[nom, email,password],(err, result) => {
-                console.log("bonjour ");
-                if (err) {
-                  console.log("ERREUR", err);
-                  // res.send('bonjour')
-                } else {
-                  console.log("success", result);
-                  res.redirect("/");
-                }
-              }
-            ); 
-
-
-                 //CRYPTE LES DONNEES avec cryptage
-
-          
-                 var hashedPassword = await bcrypt.hash(password ,8)
-                 console.log(hashedPassword)
+                
         })
        
 
