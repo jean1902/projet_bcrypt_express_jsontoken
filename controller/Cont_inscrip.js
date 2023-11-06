@@ -34,7 +34,7 @@ let authcontrollers = class insert{
                   console.log(hashedPassword)
  
                   let sql_hash ="INSERT INTO `user_session` set ? ";
-              
+              //password= hashedPassword
                   db.query(sql_hash,{nom,email,password:hashedPassword},(err, result) => {
                     console.log("bonjour ");
                     if (err) {
